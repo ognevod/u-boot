@@ -226,6 +226,9 @@ void board_init_f(ulong dummy)
 
 void reset_cpu(ulong addr)
 {
+        sys_t sys;
+        INIT_SYS_REGS(sys);
+        sys.PMCTR->SW_RST=1;
 }
 
 #ifndef CONFIG_SYS_DCACHE_OFF
