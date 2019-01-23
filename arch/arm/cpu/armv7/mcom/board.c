@@ -158,7 +158,7 @@ void board_init_f(ulong dummy)
 
 	preloader_console_init();
 
-#ifdef CONFIG_TARGET_SALUTE_PM
+#if defined (CONFIG_TARGET_SALUTE_PM) || defined(CONFIG_TARGET_SALUTE_PM_MMCBE)
 	/* Enable I2C0 clock here since DDR power on Salute-EL24PM1
 	 * is enabled using I2C0.*/
 	sys.CMCTR->GATE_SYS_CTR |= CMCTR_GATE_SYS_CTR_I2C0_EN;

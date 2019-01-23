@@ -15,7 +15,7 @@
 #define TDA998x_I2S	2
 
 / {
-	model = "Salute-EL24PM2 r1.0, MM-CBE r1.0";
+	model = "Salute-EL24PM2 r1.0, MM-CBE r1.0+";
 	chosen {
 		bootargs = "console=ttyS0,115200";
 	};
@@ -130,6 +130,7 @@
 };
 
 &ethernet {
+	local-mac-address = [DE AD DE AD BE E1];
 	status = "okay";
 };
 
