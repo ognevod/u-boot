@@ -1,0 +1,258 @@
+/*
+ * Copyright 2018 MicroMax Systems
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+*/
+
+/dts-v1/;
+
+#include "mcom02-salute-el24pm-common.dtsi"
+#include <dt-bindings/interrupt-controller/irq.h>
+
+#define TDA998x_SPDIF	1
+#define TDA998x_I2S	2
+
+/ {
+	model = "Salute-EL24PM2 r1.0, MM-CBE r1.0+";
+	chosen {
+		bootargs = "console=ttyS0,115200";
+	};
+
+	aliases {
+		spi0 = &spi0;
+	};
+
+	clocks {
+		can_clk: can_clk {
+			#clock-cells = <0>;
+			compatible = "fixed-clock";
+			clock-frequency = <16000000>;
+		};
+	};
+
+	leds {
+		dbgled2 {
+			label = "salute:green:dbgled2";
+			gpios = <&gpioa 15 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "mmc1";
+		};
+
+		userled {
+			label = "salute:green:userled";
+			gpios = <&gpiod 27 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
+	regulators {
+	};
+
+	sound_hdmi: sound-hdmi {
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "Salute-EL24OM1-HDMI";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,bitclock-master = <&dailink1_master>;
+		simple-audio-card,frame-master = <&dailink1_master>;
+
+		dailink1_master: simple-audio-card,cpu {
+			sound-dai = <&i2s>;
+		};
+
+		simple-audio-card,codec {
+			sound-dai = <&tda19988>;
+		};
+	};
+
+	backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm 0 500000>;
+		brightness-levels = <
+			 0  1  2  3  4  5  6  7  8  9
+			10 11 12 13 14 15 16 17 18 19
+			20 21 22 23 24 25 26 27 28 29
+			30 31 32 33 34 35 36 37 38 39
+			40 41 42 43 44 45 46 47 48 49
+			50 51 52 53 54 55 56 57 58 59
+			60 61 62 63 64 65 66 67 68 69
+			70 71 72 73 74 75 76 77 78 79
+			80 81 82 83 84 85 86 87 88 89
+			90 91 92 93 94 95 96 97 98 99
+			100>;
+		default-brightness-level = <50>;
+	};
+
+	at070tn92: panel0 {
+		compatible = "elvees,mcom02-vpout,panel";
+
+		panel-info {
+			bpp = <32>;
+		};
+
+		display-timings {
+			800x480p60 {
+				clock-frequency = <33300000>;
+				hactive = <800>;
+				vactive = <480>;
+				hfront-porch = <85>;
+				hback-porch = <85>;
+				hsync-len = <86>;
+				vfront-porch = <15>;
+				vback-porch = <15>;
+				vsync-len = <15>;
+			};
+		};
+	};
+
+	ej070na: panel1 {
+		compatible = "elvees,mcom02-vpout,panel";
+
+		panel-info {
+			bpp = <32>;
+		};
+
+		display-timings {
+			1024x600p60 {
+				clock-frequency = <51206400>;
+				hactive = <1024>;
+				vactive = <600>;
+				hfront-porch = <100>;
+				hback-porch = <100>;
+				hsync-len = <120>;
+				vfront-porch = <10>;
+				vback-porch = <10>;
+				vsync-len = <15>;
+			};
+		};
+	};
+
+};
+
+&ethernet {
+	local-mac-address = [DE AD DE AD BE E1];
+	status = "okay";
+};
+
+&i2c0 {
+	tda19988: hdmi-encoder@70 {
+		compatible = "nxp,tda998x";
+		reg = <0x70>;
+		interrupt-parent = <&gpioa>;
+		interrupts = <11 GPIO_ACTIVE_HIGH>;
+		video-ports = <0x234501>;
+		#sound-dai-cells = <0>;
+		audio-ports = <TDA998x_I2S 0x3>;
+
+		port {
+			hdmi_in: endpoint {
+				remote-endpoint = <&hdmi_out>;
+			};
+		};
+	};
+};
+
+&i2c1 {
+	mcp7940x: rtc@6f {
+		compatible = "microchip,mcp7940x";
+		reg = <0x6f>;
+		interrupt-parent = <&gpioa>;
+		interrupts = <12 GPIO_ACTIVE_HIGH>;
+		wakeup-source;
+	};
+	si514: clock-generator@55 {
+		reg = <0x55>;
+		#clock-cells = <0>;
+		compatible = "silabs,si514";
+	};	
+};
+
+&i2c2 {
+	status = "okay";
+};
+
+&i2s {
+	clocks = <&i2s_pclk>, <&si514 0>;
+	clock-names = "pclk", "i2sclk";
+	status = "okay";
+};
+
+&pwm {
+	status = "okay";
+};
+
+&sd1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	keep-power-in-suspend;
+	status = "okay";
+};
+
+&sound {
+	status = "okay";
+};
+
+&spi0 {
+	num-cs = <3>;
+	/* Third argument of "cs-gpios" property is set to 0,
+	 * because it is ignored by the SPI driver. */
+	cs-gpios = <&gpiod 18 0>, <&gpiod 19 0>, <&gpiod 20 0>;
+
+	can1: can@1 {
+		compatible = "microchip,mcp2515";
+		reg = <0x1>;
+		spi-max-frequency = <10000000>;
+		clocks = <&can_clk>;
+		interrupt-parent = <&gpioa>;
+		interrupts = <31 GPIO_ACTIVE_HIGH>;
+	};
+	can2: can@2 {
+		compatible = "microchip,mcp2515";
+		reg = <0x2>;
+		spi-max-frequency = <10000000>;
+		clocks = <&can_clk>;
+		interrupt-parent = <&gpioa>;
+		interrupts = <9 GPIO_ACTIVE_HIGH>;
+	};
+
+};
+
+/* RS-232 is used as physical layer for UART0 */
+&uart0 {
+	status = "okay";
+};
+
+/* RS-232 is used as physical layer for UART1 */
+&uart1 {
+	status = "okay";
+};
+
+/* RS-485 is used as physical layer for UART2 */
+&uart2 {
+    rts-gpio = <&gpioc 21 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+};
+
+/* RS-485 is used as physical layer for UART3 */
+&uart3 {
+	rts-gpio = <&gpioc 23 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+};
+
+&vinc {
+
+};
+
+&vpout {
+	status = "okay";
+
+	port {
+		hdmi_out: endpoint {
+			remote-endpoint = <&hdmi_in>;
+		};
+	};
+};
+
+&usb {
+        status = "okay";
+};
