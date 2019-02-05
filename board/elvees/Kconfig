@@ -51,12 +51,19 @@ config TARGET_SALUTE_PM
 	help
 	  Support for Salute-EL24PM1 board
 
+config TARGET_SALUTE_PM_MMCBE
+	bool "Salute-PM-MMCBE"
+	select SUPPORT_SPL
+	help
+	  Support for Salute-EL24PM1/MM-CBE board
+
 endchoice
 
 source "board/elvees/salute-d1/Kconfig"
 source "board/elvees/salute-d2/Kconfig"
 source "board/elvees/ipku/Kconfig"
 source "board/elvees/salute-pm/Kconfig"
+source "board/elvees/salute-pm_mmcbe/Kconfig"
 
 config FDTFILE
 	string "Default fdtfile env setting for this board"
