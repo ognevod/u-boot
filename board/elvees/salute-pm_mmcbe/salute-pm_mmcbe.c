@@ -17,7 +17,9 @@
 #include <linux/kernel.h>
 
 #include <i2c.h>
-#include <libfdt.h>
+#include <linux/libfdt.h>
+
+#include <environment.h>
 
 DECLARE_GLOBAL_DATA_PTR;
 
@@ -98,7 +100,7 @@ int set_sdram_cfg(struct ddr_cfg *cfg, int tck)
 
 int set_variable(const char *name, char *value)
 {
-		char *oldval = getenv(name);		
+		char *oldval = env_get(name);		
 		if (oldval && strcmp(value, oldval))
 		{
 			printf("Warning: \"%s\" variable value (%s) does not match the EEPROM value (%s)\n", name, oldval, value);
@@ -106,7 +108,7 @@ int set_variable(const char *name, char *value)
 	
 		if (!oldval)
 		{
-			int ret = setenv(name, value);	
+			int ret = env_set(name, value);	
 			if (ret)
 			{
 				printf("Unable to set variable \"%s\", error: %d\n", name, ret);
@@ -216,7 +218,7 @@ void get_board_serial(struct tag_serialnr *serialnr)
         char *serial_string;
         unsigned long long serial;
 
-        serial_string = getenv("serial#");
+        serial_string = env_get("serial#");
 
         if (serial_string)
         {
@@ -235,9 +237,9 @@ void get_board_serial(struct tag_serialnr *serialnr)
 u32 get_board_rev(void)
 {
 
-        if (getenv("revision#") != NULL)
+        if (env_get("revision#") != NULL)
         {
-			return simple_strtoul(getenv("revision#"), NULL, 10);
+			return simple_strtoul(env_get("revision#"), NULL, 10);
 		}
         return 0;
 }
