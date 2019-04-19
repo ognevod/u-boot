@@ -30,7 +30,7 @@
 #define DIV_SYS1_CTR_VALUE		1	/* L3_PCLK = L1_HCLK / 2 */
 #endif
 
-#if defined(CONFIG_TARGET_SALUTE_PM) || defined(CONFIG_TARGET_SALUTE_D2)
+#if defined(CONFIG_TARGET_SALUTE_PM) || defined(CONFIG_TARGET_SALUTE_D2) || defined(CONFIG_TARGET_SALUTE_PM_MMCBE)
 #define CPLL_VALUE			0x14
 #else
 
@@ -66,7 +66,7 @@
 #define CONFIG_SYS_MALLOC_LEN		SZ_8M
 
 /* I2C support */
-#ifdef CONFIG_TARGET_SALUTE_PM
+#if defined(CONFIG_TARGET_SALUTE_PM) || defined(CONFIG_TARGET_SALUTE_PM_MMCBE)
 #define CONFIG_SYS_I2C
 #define CONFIG_SYS_I2C_BASE		0x3802C000
 #define CONFIG_SYS_I2C_SPEED		100000
@@ -169,7 +169,7 @@
 	"fi;"
 #endif
 
-#ifdef CONFIG_TARGET_SALUTE_PM
+#if defined(CONFIG_TARGET_SALUTE_PM) || defined(CONFIG_TARGET_SALUTE_PM_MMCBE)
 #define DDRCTL_CMD "ddrctl_cmd=enable\0"
 #else
 #define DDRCTL_CMD "ddrctl_cmd=disable\0"
@@ -181,7 +181,7 @@
 #define BLACKLIST
 #endif
 
-#ifdef CONFIG_TARGET_SALUTE_PM
+#if defined(CONFIG_TARGET_SALUTE_PM) || defined(CONFIG_TARGET_SALUTE_PM_MMCBE)
 #define VIDEO_MODE "video=HDMI:1920x1080"
 #else
 #define VIDEO_MODE
@@ -257,5 +257,12 @@
 #define CONFIG_SYS_SPI_U_BOOT_OFFS		CONFIG_SPL_PAD_TO
 
 #define CONFIG_BUILD_TARGET		"u-boot.mcom"
+
+#ifdef CONFIG_TARGET_SALUTE_PM_MMCBE
+#define CONFIG_BOARD_LATE_INIT
+#define CONFIG_SERIAL_TAG
+#define CONFIG_REVISION_TAG
+#define CONFIG_CMDLINE_TAG 
+#endif
 
 #endif /* __MCOM_H */
