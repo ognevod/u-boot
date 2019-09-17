@@ -1,0 +1,9 @@
+if TARGET_SALUTE_PM_MMCBE
+
+config SYS_BOARD
+	default "salute-pm_mmcbe"
+
+config SYS_CONFIG_NAME
+	default "mcom"
+
+endif
